@@ -14,7 +14,7 @@ KEYWORD : 'PROGRAM' | 'BEGIN' | 'END' | 'FUNCTION' | 'READ' | 'WRITE' | 'IF' |
          'ELSE' | 'ENDIF' | 'WHILE' | 'ENDWHILE' | 'CONTINUE' | 'BREAK' |
          'RETURN' | 'INT' | 'VOID' | 'STRING' | 'FLOAT' ;
 
-FLOATLITERAL : DIGIT+.DIGIT* | DIGIT*.DIGIT+ ;
+FLOATLITERAL : DIGIT+'.'DIGIT* | DIGIT*'.'DIGIT+ ;
 INTLITERAL : DIGIT+ ;
 STRINGLITERAL : '"' ~'"'* '"' ;
 OPERATOR : ':=' | '+' | '-' | '*' | '/' | '=' | '!=' | '<' | '>' | '(' | ')' |
