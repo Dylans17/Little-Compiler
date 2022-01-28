@@ -11,8 +11,9 @@ public class Driver {
 		CharStream stdin = CharStreams.fromStream(System.in);
 		Little littleLexer = new Little(stdin);
 		Vocabulary vocab = littleLexer.getVocabulary();
-		for (Token t:littleLexer.getAllTokens()) {	
-			System.out.println(vocab.getSymbolicName(t.getType()) + ":" + t.getText());
+		for (Token t:littleLexer.getAllTokens()) {
+			System.out.println("Token Type: " + vocab.getSymbolicName(t.getType()));
+			System.out.println("Value: " + t.getText());
 		}
 	}
 }
