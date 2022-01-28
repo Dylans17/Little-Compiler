@@ -26,3 +26,11 @@ IDENTIFIER : CHAR ALNUM* ;
  *----------------------*/
 COMMENT : '--' ~'\n'* '\n' -> skip ;
 WHITESPACE : [ \t\r\n]+ -> skip ;
+
+/*----------------------
+ * Error Detection:
+ * Rather than using ANTLR's errors when unknown characters appear,
+ * this allows us to handle it ourselves by using a token.
+ *----------------------*/
+//For now, I am just going to exit
+ERROR : . {System.exit(-1);};
