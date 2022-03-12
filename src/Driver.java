@@ -144,4 +144,4 @@ class SymbolAttributes {
 		return this.value;
 	}
 	
-}//end class
+}//end classs
