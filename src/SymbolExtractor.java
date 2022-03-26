@@ -5,24 +5,26 @@ import java.util.Stack;
 class SymbolExtractor extends LittleBaseListener {
 
 	private Stack<SymbolTable> symbolTableStack;
-	private SymbolTable currentTable;
+	private ArrayList<SymbolTable> allSymbolTables;
 
 	public SymbolExtractor() {
 		this.symbolTableStack = new Stack<SymbolTable>();
-		this.currentTable = null;
+		this.allSymbolTables = new ArrayList<SymbolTable>();
+		
 	}
 
 	@Override public void enterProgram(LittleParser.ProgramContext ctx) {
-
-		this.symbolTableStack.push(new SymbolTable("GLOBAL"));
-		this.currentTable = this.symbolTableStack.peek();
+		SymbolTable newSymTab = new SymbolTable("GLOBAL");
+		this.symbolTableStack.push(newSymTab);
+		this.allSymbolTables.add(newSymTab);
 
 	}
 
 	@Override public void exitProgram(LittleParser.ProgramContext ctx) {
-
-
-
+		//step 3 output
+		for (SymbolTable symTab : allSymbolTables) {
+			symTab.print();
+		}
 	}
 
 	@Override public void enterPgm_body(LittleParser.Pgm_bodyContext ctx) {
@@ -43,7 +45,7 @@ class SymbolExtractor extends LittleBaseListener {
 
 	@Override public void enterString_decl(LittleParser.String_declContext ctx) {
 
-		this.currentTable.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("STRING",ctx.str().STRINGLITERAL().getText()));
+		this.symbolTableStack.peek().addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("STRING",ctx.str().STRINGLITERAL().getText()));
 
 	}
 
@@ -69,7 +71,7 @@ class SymbolExtractor extends LittleBaseListener {
 
 }//end class
 
-class SymbolTable{
+class SymbolTable {
 
 	private String scope;
 	private HashMap<String, SymbolAttributes> symbolTable;
@@ -96,6 +98,14 @@ class SymbolTable{
 		this.symbolTable.put(symbolName, attributes);
 		this.symbolNames.add(symbolName);
 	}
+	
+	public void print() {
+		System.out.println("Symbol table " + this.scope);
+		for (String symName : symbolNames) {
+			SymbolAttributes attr = this.symbolTable.get(symName);
+			System.out.printf("name %s type %s\n", symName, attr.getType());
+		}
+	}
 
 }//end class
 
@@ -113,9 +123,7 @@ class SymbolAttributes {
 		return this.type;
 	}
 
-	public String getValue()
-	{
+	public String getValue() {
 		return this.value;
 	}
-
 }//end class

@@ -1,5 +1,6 @@
 import java.io.IOException;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Driver {
 
@@ -8,10 +9,13 @@ public class Driver {
 		LittleLexer littleLexer = new LittleLexer(stdin);
 		CommonTokenStream tokens = new CommonTokenStream(littleLexer);
 		LittleParser parser = new LittleParser(tokens);
-		parser.removeErrorListeners(); //do not want default error rules
-		parser.addErrorListener(new BasicErrorListener()); //want basic yes/no
-		parser.program(); //program is start rule
-		System.out.println("Accepted");
+		SymbolExtractor extractor = new SymbolExtractor();
+		
+		//parser.removeErrorListeners(); //do not want default error rules
+		//parser.addErrorListener(new BasicErrorListener()); //want basic yes/no
+		
+		LittleParser.ProgramContext ctx = parser.program(); //program is start rule
+		ParseTreeWalker.DEFAULT.walk(extractor, ctx);
 	}
 }
 
