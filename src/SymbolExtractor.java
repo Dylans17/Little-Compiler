@@ -8,11 +8,12 @@ class SymbolExtractor extends LittleBaseListener {
 	private ArrayList<SymbolTable> allSymbolTables;
 	private String varDeclType;
 	private ArrayList<String> varDeclIdList;
-
+	private int currentBlockNumber;
+	
 	public SymbolExtractor() {
 		this.symbolTableStack = new Stack<SymbolTable>();
 		this.allSymbolTables = new ArrayList<SymbolTable>();
-
+		this.currentBlockNumber = 1;
 	}
 
 	@Override
@@ -82,6 +83,39 @@ class SymbolExtractor extends LittleBaseListener {
 
 	@Override
 	public void exitFunc_decl(LittleParser.Func_declContext ctx) {
+		this.symbolTableStack.pop();
+	}
+	
+	@Override 
+	public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
+		SymbolTable newSymTab = new SymbolTable("BLOCK " + this.currentBlockNumber++);
+		this.symbolTableStack.push(newSymTab);
+		this.allSymbolTables.add(newSymTab);
+	}
+	
+	@Override
+	public void exitIf_stmt(LittleParser.If_stmtContext ctx) {
+		this.symbolTableStack.pop();
+	}
+	
+	@Override
+	public void enterElse_part(LittleParser.Else_partContext ctx) {
+		if (ctx.getChildCount() == 0)
+			return;
+		this.symbolTableStack.pop();
+		SymbolTable newSymTab = new SymbolTable("BLOCK " + this.currentBlockNumber++);
+		this.symbolTableStack.push(newSymTab);
+		this.allSymbolTables.add(newSymTab);
+	}
+	@Override
+	public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
+		SymbolTable newSymTab = new SymbolTable("BLOCK " + this.currentBlockNumber++);
+		this.symbolTableStack.push(newSymTab);
+		this.allSymbolTables.add(newSymTab);
+	}
+	
+	@Override
+	public void exitWhile_stmt(LittleParser.While_stmtContext ctx) {
 		this.symbolTableStack.pop();
 	}
 
