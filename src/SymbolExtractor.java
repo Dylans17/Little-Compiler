@@ -34,7 +34,7 @@ class SymbolExtractor extends LittleBaseListener {
 	@Override
 	public void enterString_decl(LittleParser.String_declContext ctx) {
 		SymbolTable current = this.symbolTableStack.peek();
-		current.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("STRING",ctx.str().STRINGLITERAL().getText()));
+		current.addSymbol(ctx.id().IDENTIFIER().getText(), new StringAttribute(ctx.str().STRINGLITERAL().getText()));
 	}
 
 	@Override
@@ -48,7 +48,7 @@ class SymbolExtractor extends LittleBaseListener {
 		SymbolTable current = this.symbolTableStack.peek();
 
 		for (String var: varDeclIdList) {
-			current.addSymbol(var, new SymbolAttributes(varDeclType, null));
+			current.addSymbol(var, new SymbolAttribute(varDeclType));
 		}
 
 		varDeclType = null;
@@ -70,7 +70,7 @@ class SymbolExtractor extends LittleBaseListener {
 	@Override
 	public void enterParam_decl(LittleParser.Param_declContext ctx) {
 		SymbolTable current = this.symbolTableStack.peek();
-		current.addSymbol(ctx.id().getText(), new SymbolAttributes(ctx.var_type().getText(), null));
+		current.addSymbol(ctx.id().getText(), new SymbolAttribute(ctx.var_type().getText()));
 	}
 
 	@Override
@@ -90,13 +90,13 @@ class SymbolExtractor extends LittleBaseListener {
 class SymbolTable {
 
 	private String scope;
-	private HashMap<String, SymbolAttributes> symbolTable;
+	private HashMap<String, SymbolAttribute> symbolTable;
 
 	private ArrayList<String> symbolNames;
 
 	public SymbolTable(String scope) {
 		this.scope = scope;
-		this.symbolTable = new HashMap<String, SymbolAttributes>();
+		this.symbolTable = new HashMap<String, SymbolAttribute>();
 		this.symbolNames = new ArrayList<String>();
 	}
 
@@ -104,7 +104,7 @@ class SymbolTable {
 		return this.scope;
 	}
 
-	public void addSymbol(String symbolName, SymbolAttributes attributes) {
+	public void addSymbol(String symbolName, SymbolAttribute attributes) {
 
 		if(this.symbolTable.containsKey(symbolName)) {
 			System.out.printf("DECLARATION ERROR %s\n", symbolName);
@@ -118,26 +118,36 @@ class SymbolTable {
 	public void print() {
 		System.out.println("Symbol table " + this.scope);
 		for (String symName : symbolNames) {
-			SymbolAttributes attr = this.symbolTable.get(symName);
-			System.out.printf("name %s type %s\n", symName, attr.getType());
+			SymbolAttribute attr = this.symbolTable.get(symName);
+			System.out.printf("name %s type %s", symName, attr.getType());
+			if (attr instanceof StringAttribute) {
+				System.out.printf(" value %s", ((StringAttribute) attr).getValue());
+			}
+			System.out.println();
 		}
 		System.out.println();
 	}
 
 }//end class
 
-class SymbolAttributes {
+class SymbolAttribute {
+	private String type;
 
-	String type;
-	String value;
-
-	public SymbolAttributes(String type, String value) {
+	public SymbolAttribute(String type) {
 		this.type = type;
-		this.value = value;
 	}
 
 	public String getType() {
 		return this.type;
+	}
+}//end class
+
+class StringAttribute extends SymbolAttribute {
+	private String value;
+
+	public StringAttribute(String value) {
+		super("STRING");
+		this.value = value;
 	}
 
 	public String getValue() {
