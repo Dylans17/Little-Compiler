@@ -16,20 +16,19 @@ class SymbolExtractor extends LittleBaseListener {
 		this.currentBlockNumber = 1;
 	}
 
+	public void printAllSymbolTables() {
+		//step 3 output
+		for (SymbolTable symTab : allSymbolTables) {
+			symTab.print();
+		}
+	}
+	
 	@Override
 	public void enterProgram(LittleParser.ProgramContext ctx) {
 		SymbolTable newSymTab = new SymbolTable("GLOBAL");
 		this.symbolTableStack.push(newSymTab);
 		this.allSymbolTables.add(newSymTab);
 
-	}
-
-	@Override
-	public void exitProgram(LittleParser.ProgramContext ctx) {
-		//step 3 output
-		for (SymbolTable symTab : allSymbolTables) {
-			symTab.print();
-		}
 	}
 
 	@Override
