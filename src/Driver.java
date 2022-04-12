@@ -11,12 +11,14 @@ public class Driver {
 		LittleParser parser = new LittleParser(tokens);
 		SymbolExtractor extractor = new SymbolExtractor();
 
-		parser.removeErrorListeners(); //do not want default error rules
-		parser.addErrorListener(new BasicErrorListener()); //want basic yes/no
+		//parser.removeErrorListeners(); //do not want default error rules
+		//parser.addErrorListener(new BasicErrorListener()); //want basic yes/no
 
 		LittleParser.ProgramContext ctx = parser.program(); //program is start rule
 		ParseTreeWalker.DEFAULT.walk(extractor, ctx);
-		
+		InstructionExtractor intermediateRepresentation = new InstructionExtractor(extractor);
+		ParseTreeWalker.DEFAULT.walk(intermediateRepresentation, ctx);
+		intermediateRepresentation.simplePrint();
 	}
 }
 

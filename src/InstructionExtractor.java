@@ -1,15 +1,19 @@
 import java.util.ArrayList;
 
 public class InstructionExtractor extends LittleBaseListener {
-	private SymbolExtractor symTab;
+	private SymbolExtractor symTabs;
 	private ArrayList<InstructionNode> instructionList;
 	private InstructionNode currentInstruction;
 	
-	public InstructionExtractor(SymbolExtractor symTab) {
-		this.symTab = symTab;
+	public InstructionExtractor(SymbolExtractor symTabs) {
+		this.symTabs = symTabs;
 		this.instructionList = new ArrayList<InstructionNode>();
 	}
 	
+	public void simplePrint() {
+		//temporary output for testing, will be removed!
+		System.out.printf("There are %d read/write statements!\n", instructionList.size());
+	}
 	
 	//statement types
 	@Override 
@@ -20,11 +24,13 @@ public class InstructionExtractor extends LittleBaseListener {
 	@Override 
 	public void enterRead_stmt(LittleParser.Read_stmtContext ctx) {
 		currentInstruction = new ReadNode();
+		instructionList.add(currentInstruction);
 	}
 	
 	@Override 
 	public void enterWrite_stmt(LittleParser.Write_stmtContext ctx) {
 		currentInstruction = new WriteNode();
+		instructionList.add(currentInstruction);
 	}
 	
 	
