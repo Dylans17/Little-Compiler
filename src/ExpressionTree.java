@@ -11,7 +11,7 @@ public class ExpressionTree {
 		return lChild;
 	}
 	
-	public static BinaryNode parse(LittleParser.Expr_prefixContext ctx) {
+	private static BinaryNode parse(LittleParser.Expr_prefixContext ctx) {
 		/**
 		 * Returns Binary Node with missing Right Child or null if undefined
 		 */
@@ -30,7 +30,7 @@ public class ExpressionTree {
 		return new BinaryNode(lChild, operator);
 	}
 	
-	public static ExpressionTree parse(LittleParser.FactorContext ctx) {
+	private static ExpressionTree parse(LittleParser.FactorContext ctx) {
 		BinaryNode lChild = parse(ctx.factor_prefix());
 		ExpressionTree rChild = parse(ctx.postfix_expr());
 		if (lChild == null) {
@@ -40,7 +40,7 @@ public class ExpressionTree {
 		return lChild;
 	}
 	
-	public static BinaryNode parse(LittleParser.Factor_prefixContext ctx) {
+	private static BinaryNode parse(LittleParser.Factor_prefixContext ctx) {
 		/**
 		 * Returns Binary Node with missing Right Child or null if undefined
 		 */
@@ -59,7 +59,7 @@ public class ExpressionTree {
 		return new BinaryNode(lChild, operator);
 	}
 	
-	public static ExpressionTree parse(LittleParser.Postfix_exprContext ctx) {
+	private static ExpressionTree parse(LittleParser.Postfix_exprContext ctx) {
 		if (ctx.call_expr() != null) {
 			throw new UnsupportedOperationException("Functions other than main are not implemented");
 		}
@@ -79,6 +79,13 @@ public class ExpressionTree {
 		// ctx.FLOATLITERAL() != null
 		return new LeafNode(Double.parseDouble(ctx.FLOATLITERAL().getText()));
 	}
+	
+	public void print() {
+		/**
+		 * Just for testing
+		 */
+		System.out.print("BAD-NODE");
+	}
 }
 
 class BinaryNode extends ExpressionTree {
@@ -95,6 +102,19 @@ class BinaryNode extends ExpressionTree {
 	public BinaryNode(ExpressionTree lChild, String operator) {
 		this.lChild = lChild;
 		this.operator = operator;
+	}
+	
+	public void print() {
+		/**
+		 * Just for testing
+		 */
+		System.out.print("(");
+		lChild.print();
+		System.out.print(")");
+		System.out.print(operator);
+		System.out.print("(");
+		rChild.print();
+		System.out.print(")");
 	}
 }
 
@@ -118,5 +138,18 @@ class LeafNode extends ExpressionTree {
 	public LeafNode(Integer val) {
 		this.type = "INT";
 		this.intValue = val;
+	}
+	public void print() {
+		switch(type) {
+		case "id":
+			System.out.print(id);
+			break;
+		case "FLOAT":
+			System.out.print(floatValue);
+			break;
+		case "INT":
+			System.out.print(intValue);
+			break;
+		}
 	}
 }

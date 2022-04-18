@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -16,9 +18,16 @@ public class Driver {
 
 		LittleParser.ProgramContext ctx = parser.program(); //program is start rule
 		ParseTreeWalker.DEFAULT.walk(extractor, ctx);
-		InstructionExtractor intermediateRepresentation = new InstructionExtractor(extractor);
+		InstructionExtractor intermediateRepresentation = new InstructionExtractor();
 		ParseTreeWalker.DEFAULT.walk(intermediateRepresentation, ctx);
-		intermediateRepresentation.simplePrint();
+		
+		
+		ArrayList<InstructionNode> instructionList = intermediateRepresentation.getInstructions();
+		//TODO: add optimizations before converting, add optimizations after converting
+		
+		for (InstructionNode inst : instructionList) {
+			System.out.println(inst.getAssembly());
+		}
 	}
 }
 

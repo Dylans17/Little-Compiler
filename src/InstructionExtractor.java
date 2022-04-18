@@ -1,12 +1,10 @@
 import java.util.ArrayList;
 
 public class InstructionExtractor extends LittleBaseListener {
-	private SymbolExtractor symTabs;
 	private ArrayList<InstructionNode> instructionList;
 	private InstructionNode currentInstruction;
 	
-	public InstructionExtractor(SymbolExtractor symTabs) {
-		this.symTabs = symTabs;
+	public InstructionExtractor() {
 		this.instructionList = new ArrayList<InstructionNode>();
 	}
 	
@@ -15,15 +13,15 @@ public class InstructionExtractor extends LittleBaseListener {
 		System.out.printf("There are %d read/write/assign statements!\n", instructionList.size());
 	}
 	
-	public void printAssembly() {
-		//print all variable declarations
+	public ArrayList<InstructionNode> getInstructions() {
+		return instructionList;
 		
 	}
 	
 	//statement types
 	@Override 
 	public void enterAssign_stmt(LittleParser.Assign_stmtContext ctx) {
-		currentInstruction = new AssignNode();
+		AssignNode currentInstruction = new AssignNode(ctx.assign_expr().id().getText(), ctx.assign_expr().expr());
 		instructionList.add(currentInstruction);
 	}
 	
@@ -73,11 +71,6 @@ public class InstructionExtractor extends LittleBaseListener {
 		if (ctx.id() != null && currentInstruction != null)
 			currentInstruction.addId(ctx.id().getText());
 	}
-	
-	@Override
-	public void enterExpr(LittleParser.ExprContext ctx) {
-		
-	}
 }
 
 
@@ -90,19 +83,19 @@ class AssignNode implements InstructionNode {
 	String id;
 	ExpressionTree valueRoot;
 
-	public void addId(String id) {
-		if (this.id != null) {
-			throw new IllegalStateException(
-					"Should never be in a state where an id is added twice to AssignNode");
-		}
+	public AssignNode(String id, LittleParser.ExprContext ctx) {
 		this.id = id;
-	}
-	
-	public void addExpr(LittleParser.ExprContext ctx) {
 		this.valueRoot = ExpressionTree.parse(ctx);
 	}
 	
+	public void addId(String id) {
+		throw new IllegalStateException("Should not addId to AssignNode");
+	}
+	
 	public String getAssembly() {
+		//TODO: actually put instructions here lmao
+		System.out.print(id + " = ");
+		valueRoot.print();
 		return "";
 	}
 }
@@ -125,24 +118,24 @@ abstract class BuiltinFunc implements InstructionNode {
 
 class ReadNode extends BuiltinFunc {
 	public String getAssembly() {
-		String result = "";
+		ArrayList<String> instructions = new ArrayList<String>();
 		for (String id : idList) {
 			//TODO: get type from symbolTable
 			//TODO: use registers instead of ids
-			result += "sys read[type] " + id;
+			instructions.add("sys read[type] " + id);
 		}
-		return result;
+		return String.join("\n", instructions);
 	}
 }
 
 class WriteNode extends BuiltinFunc {
 	public String getAssembly() {
-		String result = "";
+		ArrayList<String> instructions = new ArrayList<String>();
 		for (String id : idList) {
 			//TODO: get type from symbolTable
 			//TODO: use registers instead of ids
-			result += "sys write[type] " + id;
+			instructions.add("sys write[type] " + id);
 		}
-		return result;
+		return String.join("\n", instructions);
 	}
 }
