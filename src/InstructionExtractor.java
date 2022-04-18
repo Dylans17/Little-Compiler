@@ -12,13 +12,19 @@ public class InstructionExtractor extends LittleBaseListener {
 	
 	public void simplePrint() {
 		//temporary output for testing, will be removed!
-		System.out.printf("There are %d read/write statements!\n", instructionList.size());
+		System.out.printf("There are %d read/write/assign statements!\n", instructionList.size());
+	}
+	
+	public void printAssembly() {
+		//print all variable declarations
+		
 	}
 	
 	//statement types
 	@Override 
 	public void enterAssign_stmt(LittleParser.Assign_stmtContext ctx) {
-		//TODO
+		currentInstruction = new AssignNode();
+		instructionList.add(currentInstruction);
 	}
 	
 	@Override 
@@ -67,15 +73,22 @@ public class InstructionExtractor extends LittleBaseListener {
 		if (ctx.id() != null && currentInstruction != null)
 			currentInstruction.addId(ctx.id().getText());
 	}
+	
+	@Override
+	public void enterExpr(LittleParser.ExprContext ctx) {
+		
+	}
 }
 
 
 interface InstructionNode {
 	void addId(String id);
+	String getAssembly();
 }
 
 class AssignNode implements InstructionNode {
 	String id;
+	ExpressionTree valueRoot;
 
 	public void addId(String id) {
 		if (this.id != null) {
@@ -84,13 +97,21 @@ class AssignNode implements InstructionNode {
 		}
 		this.id = id;
 	}
+	
+	public void addExpr(LittleParser.ExprContext ctx) {
+		this.valueRoot = ExpressionTree.parse(ctx);
+	}
+	
+	public String getAssembly() {
+		return "";
+	}
 }
 
 abstract class BuiltinFunc implements InstructionNode {
 	//built-in functions read and write are different from
 	//normal function calls since they only accept a list of identifiers
 	//and NOT a list of expressions
-	private ArrayList<String> idList;
+	protected ArrayList<String> idList;
 	
 	public BuiltinFunc() {
 		this.idList = new ArrayList<String>();
@@ -103,9 +124,25 @@ abstract class BuiltinFunc implements InstructionNode {
 }
 
 class ReadNode extends BuiltinFunc {
-	
+	public String getAssembly() {
+		String result = "";
+		for (String id : idList) {
+			//TODO: get type from symbolTable
+			//TODO: use registers instead of ids
+			result += "sys read[type] " + id;
+		}
+		return result;
+	}
 }
 
 class WriteNode extends BuiltinFunc {
-	
+	public String getAssembly() {
+		String result = "";
+		for (String id : idList) {
+			//TODO: get type from symbolTable
+			//TODO: use registers instead of ids
+			result += "sys write[type] " + id;
+		}
+		return result;
+	}
 }
