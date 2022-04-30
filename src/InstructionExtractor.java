@@ -94,9 +94,10 @@ class AssignNode implements InstructionNode {
 	
 	public String getAssembly(SymbolTables symTabs) {
 		//TODO: actually put instructions here lmao
-		System.out.print(id + " = ");
-		valueRoot.print();
-		return "";
+		AssemblyReturnPair result = valueRoot.getAssembly(symTabs, symTabs.getAttribute(id).getType().equals("INT"));
+		String code = result.getCode();
+		code += String.format("move %s %s", result.getId(), id);
+		return code;
 	}
 }
 
