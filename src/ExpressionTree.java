@@ -71,13 +71,13 @@ public class ExpressionTree {
 			return parse(ctx.expr());
 		}
 		if (ctx.id() != null) {
-			return new LeafNode(ctx.id().getText());
+			return new IdLeaf(ctx.id().getText());
 		}
 		if (ctx.INTLITERAL() != null) {
-			return new LeafNode(Integer.parseInt(ctx.INTLITERAL().getText()));
+			return new IntLeaf(Integer.parseInt(ctx.INTLITERAL().getText()));
 		}
 		// ctx.FLOATLITERAL() != null
-		return new LeafNode(Double.parseDouble(ctx.FLOATLITERAL().getText()));
+		return new FloatLeaf(Double.parseDouble(ctx.FLOATLITERAL().getText()));
 	}
 	
 	public void print() {
@@ -118,38 +118,23 @@ class BinaryNode extends ExpressionTree {
 	}
 }
 
-class LeafNode extends ExpressionTree {
-	String type;
+class IdLeaf extends ExpressionTree {
 	String id;
-	Double floatValue;
-	Integer intValue;
-	
-	//should these be split into subclasses?
-	public LeafNode(String id) {
-		this.type = "id";
+	public IdLeaf(String id) {
 		this.id = id;
 	}
-	
-	public LeafNode(Double val) {
-		this.type = "FLOAT";
+}
+
+class FloatLeaf extends ExpressionTree {
+	Double floatValue;
+	public FloatLeaf(Double val) {
 		this.floatValue = val;
 	}
-	
-	public LeafNode(Integer val) {
-		this.type = "INT";
+}
+
+class IntLeaf extends ExpressionTree {
+	Integer intValue;
+	public IntLeaf(Integer val) {
 		this.intValue = val;
-	}
-	public void print() {
-		switch(type) {
-		case "id":
-			System.out.print(id);
-			break;
-		case "FLOAT":
-			System.out.print(floatValue);
-			break;
-		case "INT":
-			System.out.print(intValue);
-			break;
-		}
 	}
 }

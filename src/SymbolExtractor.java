@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 
 class SymbolExtractor extends LittleBaseListener {
@@ -36,7 +35,6 @@ class SymbolExtractor extends LittleBaseListener {
 		SymbolTable newSymTab = new SymbolTable("GLOBAL");
 		this.symbolTableStack.push(newSymTab);
 		this.allSymbolTables.add(newSymTab);
-
 	}
 
 	@Override
