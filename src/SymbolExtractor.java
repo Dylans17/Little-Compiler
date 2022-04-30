@@ -23,6 +23,14 @@ class SymbolExtractor extends LittleBaseListener {
 		}
 	}
 	
+	public SymbolTables getSymbolTables() {
+		//since step 4 is only using main and globals, this way works
+		//to get the symbol table in general, I think the best way to accomplish that
+		//is to run SymbolExtractor at the same time as InstructionExtractor
+		//then we can access the symbolTableStack while reading
+		return new SymbolTables(allSymbolTables);
+	}
+	
 	@Override
 	public void enterProgram(LittleParser.ProgramContext ctx) {
 		SymbolTable newSymTab = new SymbolTable("GLOBAL");
