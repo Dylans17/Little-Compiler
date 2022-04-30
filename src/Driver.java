@@ -25,9 +25,19 @@ public class Driver {
 		ArrayList<InstructionNode> instructionList = intermediateRepresentation.getInstructions();
 		//TODO: add optimizations before converting, add optimizations after converting
 		SymbolTables s = symExtractor.getSymbolTables();
+		for (String var : s.getSymbolNames()) {
+			SymbolAttribute attribute = s.getAttribute(var);
+			if (attribute instanceof StringAttribute) {
+				String text = ((StringAttribute) attribute).getValue();
+				System.out.printf("str %s %s\n", var, text);
+				continue;
+			}
+			System.out.printf("var %s\n", var);
+		}
 		for (InstructionNode inst : instructionList) {
 			System.out.println(inst.getAssembly(s));
 		}
+		System.out.println("sys halt");
 	}
 }
 
