@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 
 class SymbolExtractor extends LittleBaseListener {
@@ -16,20 +15,26 @@ class SymbolExtractor extends LittleBaseListener {
 		this.currentBlockNumber = 1;
 	}
 
+	public void printAllSymbolTables() {
+		//step 3 output
+		for (SymbolTable symTab : allSymbolTables) {
+			symTab.print();
+		}
+	}
+	
+	public SymbolTables getSymbolTables() {
+		//since step 4 is only using main and globals, this way works
+		//to get the symbol table in general, I think the best way to accomplish that
+		//is to run SymbolExtractor at the same time as InstructionExtractor
+		//then we can access the symbolTableStack while reading
+		return new SymbolTables(allSymbolTables);
+	}
+	
 	@Override
 	public void enterProgram(LittleParser.ProgramContext ctx) {
 		SymbolTable newSymTab = new SymbolTable("GLOBAL");
 		this.symbolTableStack.push(newSymTab);
 		this.allSymbolTables.add(newSymTab);
-
-	}
-
-	@Override
-	public void exitProgram(LittleParser.ProgramContext ctx) {
-		//step 3 output
-		for (SymbolTable symTab : allSymbolTables) {
-			symTab.print();
-		}
 	}
 
 	@Override
@@ -119,72 +124,4 @@ class SymbolExtractor extends LittleBaseListener {
 		this.symbolTableStack.pop();
 	}
 
-}//end class
-
-class SymbolTable {
-
-	private String scope;
-	private HashMap<String, SymbolAttribute> symbolTable;
-
-	private ArrayList<String> symbolNames;
-
-	public SymbolTable(String scope) {
-		this.scope = scope;
-		this.symbolTable = new HashMap<String, SymbolAttribute>();
-		this.symbolNames = new ArrayList<String>();
-	}
-
-	public String getScope() {
-		return this.scope;
-	}
-
-	public void addSymbol(String symbolName, SymbolAttribute attributes) {
-
-		if(this.symbolTable.containsKey(symbolName)) {
-			System.out.printf("DECLARATION ERROR %s\n", symbolName);
-			System.exit(0);
-		}//end if
-
-		this.symbolTable.put(symbolName, attributes);
-		this.symbolNames.add(symbolName);
-	}
-
-	public void print() {
-		System.out.println("Symbol table " + this.scope);
-		for (String symName : symbolNames) {
-			SymbolAttribute attr = this.symbolTable.get(symName);
-			System.out.printf("name %s type %s", symName, attr.getType());
-			if (attr instanceof StringAttribute) {
-				System.out.printf(" value %s", ((StringAttribute) attr).getValue());
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-}//end class
-
-class SymbolAttribute {
-	private String type;
-
-	public SymbolAttribute(String type) {
-		this.type = type;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-}//end class
-
-class StringAttribute extends SymbolAttribute {
-	private String value;
-
-	public StringAttribute(String value) {
-		super("STRING");
-		this.value = value;
-	}
-
-	public String getValue() {
-		return this.value;
-	}
 }//end class
