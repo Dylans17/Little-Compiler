@@ -52,10 +52,20 @@ class SymbolExtractor extends LittleBaseListener {
 	@Override
 	public void exitVar_decl(LittleParser.Var_declContext ctx) {
 		SymbolTable current = this.symbolTableStack.peek();
-
-		for (String var: varDeclIdList) {
-			current.addSymbol(var, new SymbolAttribute(varDeclType));
+		if (varDeclType.equals("INT")) {
+			for (String var: varDeclIdList) {
+				current.addSymbol(var, new IntAttribute());
+			}
 		}
+		else if (varDeclType.equals("FLOAT")) {
+			for (String var: varDeclIdList) {
+				current.addSymbol(var, new FloatAttribute());
+			}
+		}
+		else {
+			throw new IllegalStateException("Unknown variable type " + varDeclType);
+		}
+		
 
 		varDeclType = null;
 		varDeclIdList = null;
