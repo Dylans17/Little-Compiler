@@ -56,8 +56,8 @@ public class SymbolTable {
 }//end class
 
 class SymbolAttribute {
-	private String type;
-
+	private String type;	
+	
 	public SymbolAttribute(String type) {
 		this.type = type;
 	}
@@ -66,6 +66,80 @@ class SymbolAttribute {
 		return this.type;
 	}
 }//end class
+
+class IntAttribute extends SymbolAttribute {
+	//0-not known, 1-exact value, 2-register
+	private int valueKnown;
+	private Integer storedValue;
+	private String storedRegister;
+	public IntAttribute() {
+		super("INT");
+		valueKnown = 0;
+	}
+	
+	public void storeRegister(String register) {
+		valueKnown = 2;
+		this.storedRegister = register;
+	}
+	
+	public void storeValue(int value) {
+		valueKnown = 1;
+		storedValue = value;
+	}
+	
+	public boolean valueIsStored() {
+		return valueKnown == 1;
+	}
+	
+	public Integer getStoredValue() {
+		return valueIsStored() ? storedValue : null;
+	}
+	
+	public boolean valueIsRegister() {
+		return valueKnown == 2;
+	}
+	
+	public String getRegister() {
+		return valueIsRegister() ? storedRegister : null;
+	}
+}
+
+class FloatAttribute extends SymbolAttribute {
+	//0-not known, 1-exact value, 2-register
+	private int valueKnown;
+	private Double storedValue;
+	private String storedRegister;
+	public FloatAttribute() {
+		super("FLOAT");
+		valueKnown = 0;
+	}
+	
+	public void storeRegister(String register) {
+		valueKnown = 2;
+		this.storedRegister = register;
+	}
+	
+	public void storeValue(double value) {
+		valueKnown = 1;
+		storedValue = value;
+	}
+	
+	public boolean valueIsStored() {
+		return valueKnown == 1;
+	}
+	
+	public Double getStoredValue() {
+		return valueIsStored() ? storedValue : null;
+	}
+	
+	public boolean valueIsRegister() {
+		return valueKnown == 2;
+	}
+	
+	public String getRegister() {
+		return valueIsRegister() ? storedRegister : null;
+	}
+}
 
 class StringAttribute extends SymbolAttribute {
 	private String value;
