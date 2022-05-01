@@ -188,8 +188,38 @@ class IdLeaf extends ExpressionTree {
 	}
 	
 	public AssemblyReturnPair getAssembly(SymbolTables symTabs, boolean intMode) {
-		return new AssemblyReturnPair("", id);
+		SymbolAttribute attr = symTabs.getAttribute(id);
+		return intMode ? getAssemblyInt((IntAttribute) attr) : getAssemblyFloat((FloatAttribute) attr);
 	}
+	
+	private AssemblyReturnPair getAssemblyInt(IntAttribute attr) {
+		AssemblyReturnPair result = new AssemblyReturnPair("");
+		if (attr.valueIsStored()) {
+			result.setValue(attr.getStoredValue().toString());
+		}
+		else if (attr.valueIsRegister()) {
+			result.setValue(attr.getRegister());
+		}
+		else {
+			result.setValue(id);
+		}
+		return result;
+	}
+	
+	private AssemblyReturnPair getAssemblyFloat(FloatAttribute attr) {
+		AssemblyReturnPair result = new AssemblyReturnPair("");
+		if (attr.valueIsStored()) {
+			result.setValue(attr.getStoredValue().toString());
+		}
+		else if (attr.valueIsRegister()) {
+			result.setValue(attr.getRegister());
+		}
+		else {
+			result.setValue(id);
+		}
+		return result;
+	}
+	
 }
 
 class FloatLeaf extends ExpressionTree {
@@ -222,6 +252,9 @@ class AssemblyReturnPair {
 	private String id;
 	
 	public AssemblyReturnPair() {}
+	public AssemblyReturnPair(String code) {
+		this.code = code;
+	}
 	public AssemblyReturnPair(String code, String id) {
 		this.code = code;
 		this.id = id;
