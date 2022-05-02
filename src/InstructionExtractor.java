@@ -92,13 +92,39 @@ class AssignNode implements InstructionNode {
 		throw new IllegalStateException("Should not addId to AssignNode");
 	}
 	
+
 	public String getAssembly(SymbolTables symTabs) {
-		//TODO: actually put instructions here lmao
-		AssemblyReturnPair result = valueRoot.getAssembly(symTabs, symTabs.getAttribute(id).getType().equals("INT"));
-		String code = result.getCode();
-		code += String.format("move %s %s", result.getId(), id);
-		return code;
-	}
+        SymbolAttribute attr = symTabs.getAttribute(id);
+        boolean intMode = attr.getType().equals("INT");
+        AssemblyReturnPair result = valueRoot.getAssembly(symTabs, intMode);
+        
+        if (intMode) {
+            IntAttribute attrI = (IntAttribute) attr;
+            String value = result.getId();
+            try {
+                int intVal = Integer.parseInt(value);
+                attrI.storeValue(intVal);
+            }
+            catch (NumberFormatException e) {
+                attrI.storeRegister(value);
+            }
+        }
+        else {
+            FloatAttribute attrF = (FloatAttribute) attr;
+            String fValue = result.getId();
+            try {
+            	double floatVal = Double.parseDouble(fValue);
+            	attrF.storeValue(floatVal);
+            }
+            catch(NumberFormatException e) {
+            	attrF.storeRegister(fValue);
+            }
+        }
+        return result.getCode();
+    }
+	
+
+	
 }
 
 abstract class BuiltinFunc implements InstructionNode {
@@ -118,43 +144,38 @@ abstract class BuiltinFunc implements InstructionNode {
 }
 
 class ReadNode extends BuiltinFunc {
+	private String assemblyReadCall(SymbolAttribute attr) {
+		String type = attr.getType();
+		if (type.equals("INT")) {
+			return "sys readi";
+		}
+		if (type.equals("FLOAT")) {
+			return "sys readr";
+		}
+		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
+	}
+	
 	public String getAssembly(SymbolTables symTabs) {
 		ArrayList<String> instructions = new ArrayList<String>();
 		for (String id : idList) {
 			SymbolAttribute attr = symTabs.getAttribute(id);
-			instructions.add(assemblyReadCall(attr));
+			instructions.add(String.format("%s %s", assemblyReadCall(attr), id));
 		}
 		return String.join("\n", instructions);
-	}
-	
-	private String assemblyReadCall(SymbolAttribute attr) {
-		String type = attr.getType();
-		String register = RegisterCounter.getNext();
-		if (type.equals("INT")) {
-			IntAttribute attrI = (IntAttribute) attr;
-			attrI.storeRegister(register);
-			return "sys readi " + register;
-		}
-		if (type.equals("FLOAT")) {
-			IntAttribute attrF = (IntAttribute) attr;
-			attrF.storeRegister(register);
-			return "sys readr " + register;
-		}
-		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
 	}
 }
 
 class WriteNode extends BuiltinFunc {
-	private String assemblyWriteCall(SymbolAttribute attr, String id) {
+	private String assemblyWriteCall(SymbolAttribute attr) {
 		String type = attr.getType();
 		if (type.equals("INT")) {
-			return "sys writei " + ((IntAttribute) attr).getStorageString(id);
+			return "sys writei";
 		}
 		if (type.equals("FLOAT")) {
-			return "sys writer " + ((FloatAttribute) attr).getStorageString(id);
+			return "sys writer";
 		}
 		if (type.equals("STRING")) {
-			return "sys writes " + id;
+			return "sys writes";
 		}
 		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
 	}
@@ -164,7 +185,7 @@ class WriteNode extends BuiltinFunc {
 		for (String id : idList) {
 			//TODO: get type from symbolTable
 			SymbolAttribute attr = symTabs.getAttribute(id);
-			instructions.add(assemblyWriteCall(attr, id));
+			instructions.add(String.format("%s %s", assemblyWriteCall(attr), id));
 		}
 		return String.join("\n", instructions);
 	}
