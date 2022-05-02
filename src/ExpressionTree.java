@@ -193,11 +193,31 @@ class IdLeaf extends ExpressionTree {
 	}
 	
 	private AssemblyReturnPair getAssemblyInt(IntAttribute attr) {
-		return new AssemblyReturnPair("", attr.getStorageString(id));
+		AssemblyReturnPair result = new AssemblyReturnPair("");
+		if (attr.valueIsStored()) {
+			result.setValue(attr.getStoredValue().toString());
+		}
+		else if (attr.valueIsRegister()) {
+			result.setValue(attr.getRegister());
+		}
+		else {
+			result.setValue(id);
+		}
+		return result;
 	}
 	
 	private AssemblyReturnPair getAssemblyFloat(FloatAttribute attr) {
-		return new AssemblyReturnPair("", attr.getStorageString(id));
+		AssemblyReturnPair result = new AssemblyReturnPair("");
+		if (attr.valueIsStored()) {
+			result.setValue(attr.getStoredValue().toString());
+		}
+		else if (attr.valueIsRegister()) {
+			result.setValue(attr.getRegister());
+		}
+		else {
+			result.setValue(id);
+		}
+		return result;
 	}
 	
 }

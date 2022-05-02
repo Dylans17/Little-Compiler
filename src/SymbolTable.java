@@ -102,18 +102,6 @@ class IntAttribute extends SymbolAttribute {
 	public String getRegister() {
 		return valueIsRegister() ? storedRegister : null;
 	}
-	
-	public String getStorageString(String id) {
-		if (valueIsStored()) {
-			return getStoredValue().toString();
-		}
-		else if (valueIsRegister()) {
-			return getRegister();
-		}
-		else {
-			return id;
-		}
-	}
 }
 
 class FloatAttribute extends SymbolAttribute {
@@ -150,18 +138,6 @@ class FloatAttribute extends SymbolAttribute {
 	
 	public String getRegister() {
 		return valueIsRegister() ? storedRegister : null;
-	}
-	
-	public String getStorageString(String id) {
-		if (valueIsStored()) {
-			return getStoredValue().toString();
-		}
-		else if (valueIsRegister()) {
-			return getRegister();
-		}
-		else {
-			return id;
-		}
 	}
 }
 
