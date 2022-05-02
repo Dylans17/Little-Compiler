@@ -35,7 +35,10 @@ public class Driver {
 			System.out.printf("var %s\n", var);
 		}
 		for (InstructionNode inst : instructionList) {
-			System.out.println(inst.getAssembly(s));
+			String instCode = inst.getAssembly(s).trim();
+			if (!instCode.equals("")) {				
+				System.out.println(instCode);
+			}
 		}
 		System.out.println("sys halt");
 	}
