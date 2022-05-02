@@ -118,38 +118,43 @@ abstract class BuiltinFunc implements InstructionNode {
 }
 
 class ReadNode extends BuiltinFunc {
-	private String assemblyReadCall(SymbolAttribute attr) {
-		String type = attr.getType();
-		if (type.equals("INT")) {
-			return "sys readi";
-		}
-		if (type.equals("FLOAT")) {
-			return "sys readr";
-		}
-		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
-	}
-	
 	public String getAssembly(SymbolTables symTabs) {
 		ArrayList<String> instructions = new ArrayList<String>();
 		for (String id : idList) {
 			SymbolAttribute attr = symTabs.getAttribute(id);
-			instructions.add(String.format("%s %s", assemblyReadCall(attr), id));
+			instructions.add(assemblyReadCall(attr));
 		}
 		return String.join("\n", instructions);
+	}
+	
+	private String assemblyReadCall(SymbolAttribute attr) {
+		String type = attr.getType();
+		String register = RegisterCounter.getNext();
+		if (type.equals("INT")) {
+			IntAttribute attrI = (IntAttribute) attr;
+			attrI.storeRegister(register);
+			return "sys readi " + register;
+		}
+		if (type.equals("FLOAT")) {
+			IntAttribute attrF = (IntAttribute) attr;
+			attrF.storeRegister(register);
+			return "sys readr " + register;
+		}
+		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
 	}
 }
 
 class WriteNode extends BuiltinFunc {
-	private String assemblyWriteCall(SymbolAttribute attr) {
+	private String assemblyWriteCall(SymbolAttribute attr, String id) {
 		String type = attr.getType();
 		if (type.equals("INT")) {
-			return "sys writei";
+			return "sys writei " + ((IntAttribute) attr).getStorageString(id);
 		}
 		if (type.equals("FLOAT")) {
-			return "sys writer";
+			return "sys writer " + ((FloatAttribute) attr).getStorageString(id);
 		}
 		if (type.equals("STRING")) {
-			return "sys writes";
+			return "sys writes " + id;
 		}
 		throw new UnsupportedOperationException("Cannot handle variables with type " + type);
 	}
@@ -159,7 +164,7 @@ class WriteNode extends BuiltinFunc {
 		for (String id : idList) {
 			//TODO: get type from symbolTable
 			SymbolAttribute attr = symTabs.getAttribute(id);
-			instructions.add(String.format("%s %s", assemblyWriteCall(attr), id));
+			instructions.add(assemblyWriteCall(attr, id));
 		}
 		return String.join("\n", instructions);
 	}
