@@ -162,7 +162,7 @@ class ReadNode extends BuiltinFunc {
 			return "sys readi " + register;
 		}
 		if (type.equals("FLOAT")) {
-			IntAttribute attrF = (IntAttribute) attr;
+			FloatAttribute attrF = (FloatAttribute) attr;
 			attrF.storeRegister(register);
 			return "sys readr " + register;
 		}
